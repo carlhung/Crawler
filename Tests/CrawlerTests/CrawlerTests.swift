@@ -25,17 +25,17 @@ final class CrawlerTests: XCTestCase {
                 break
             }
             guard let wholeStr = str, let index = wholeStr.firstIndex(of: "=") else {
-                throw CrawlerError.handlerError(message: "can't get string or beginning index of \"-\"")
+                throw CrawlerError.error(message: "can't get string or beginning index of \"-\"")
             }
             let removedPreviousStr = wholeStr[index...].replacingOccurrences(of: "= ", with: "")
             guard let endIndex = removedPreviousStr.firstIndex(of: "p") else {
-                throw CrawlerError.handlerError(message: "can't get string or end index of \"p\"")
+                throw CrawlerError.error(message: "can't get string or end index of \"p\"")
             }
             let valStr = removedPreviousStr[..<endIndex].trimmingCharacters(in: .whitespacesAndNewlines)
             return valStr
         } action: { valStr in
             guard let hkdToPoundVal = Double(valStr) else {
-                throw CrawlerError.actionError(message: "can't cast to double")
+                throw CrawlerError.error(message: "can't cast to double")
             }
             // let dateStr = String(Date().description.split(separator: " ")[0].split(separator: "-")[2])
             // let msg = "$1HKD to GBP: $\(hkdToPoundVal)\n$1GBP to HKD: $\(1 / hkdToPoundVal)"
@@ -55,10 +55,8 @@ final class CrawlerTests: XCTestCase {
             repeat {
                 try crawler.run()
             } while crawler.isRunning
-        } catch let CrawlerError.actionError(error) {
-            print("Action Error: \(error)")
-        } catch let CrawlerError.handlerError(error) {
-            print("Handler Error: \(error)")
+        } catch let CrawlerError.error(error) {
+            print("Error: \(error)")
         } catch CrawlerError.noData {
             print("No Data.")
         } catch {

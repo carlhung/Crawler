@@ -8,8 +8,7 @@ import Foundation
 @frozen
 public enum CrawlerError: Swift.Error {
     case noData
-    case handlerError(message: String)
-    case actionError(message: String)
+    case error(message: String)
 }
 
 public final class Crawler {
@@ -54,7 +53,6 @@ public final class Crawler {
             case let .failure(error):
                 throw error
             case let .success(resultData):
-                // self.handler(resultData)
                 try action(handler(resultData))
             default:
                 break
