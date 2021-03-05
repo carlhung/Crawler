@@ -51,16 +51,58 @@ final class CrawlerTests: XCTestCase {
             print(msg)
         }
 
-        do {
-            repeat {
-                try crawler.run()
-            } while crawler.isRunning
-        } catch let CrawlerError.error(error) {
-            print("Error: \(error)")
-        } catch CrawlerError.noData {
-            print("No Data.")
-        } catch {
-            print("error: \(error)")
+        // do {
+        //     repeat {
+        //         try crawler.run()
+        //     } while crawler.isRunning
+        // } catch let CrawlerError.error(error) {
+        //     print("Error: \(error)")
+        // } catch CrawlerError.noData {
+        //     print("No Data.")
+        // } catch {
+        //     print("error: \(error)")
+        // }
+
+        repeat {
+            crawler.run { error in
+                switch error {
+                case let CrawlerError.error(message: msg):
+                    print(msg)
+                case CrawlerError.noData:
+                    print("No Data")
+                case let lowerLevelError:
+                    print("error: \(lowerLevelError)")
+                }
+            }
+        } while crawler.isRunning
+        sleep(5)
+    }
+
+    func testExample1() {
+        let err1: Swift.Error = CrawlerError.noData
+        let err2: Swift.Error = CrawlerError.error(message: "some error")
+        let err3: Swift.Error = Error.network
+
+        [err1, err2, err3].forEach {
+            // switch $0 {
+            // case let CrawlerError.error(message: msg):
+            //     print(msg)
+            // case CrawlerError.noData:
+            //     print("No data")
+            // case let lowerLevelError:
+            //     print("error: \(lowerLevelError)")
+            // }
+            switch $0 {
+            case let crawlerError as CrawlerError:
+                switch crawlerError {
+                case .noData:
+                    print("No Data")
+                case let .error(message: errMsg):
+                    print("Error Message: \(errMsg)")
+                }
+            case let lowerLevelError:
+                print("other error: \(lowerLevelError)")
+            }
         }
     }
 
